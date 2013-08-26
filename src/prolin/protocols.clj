@@ -15,7 +15,7 @@
 (extend-protocol LinearPolynomial
   clojure.lang.IPersistentMap
   (constant [this] (::constant this))
-  (coefficients [this] (dissoc this ::constant)))
+  (variables [this] (dissoc this ::constant)))
 
 (defprotocol Constraint
   "Representation of a linear constraint as an (in)equality"
@@ -32,7 +32,12 @@
     Any linear (in)equality can be algebraically manipulated to this
     form without any loss of generality, and it is this form that is
     used to represent all linear constraints internally. See
-    'subtract-polynomial' for a function to help transform (in)equalities
-    to this format."))
+    'subtract-polynomial' for a function to help transform
+    arbitrary (in)equalities to this format."))
 
-
+(defprotocol Solver
+  "An implementation of a linear programming solver"
+  (optimize [objective constraints minimize?]
+    "Maximize or minimize the given objective polynomial, subject to
+     the provided set of LinearConstraints. Pass true as the third
+     argument to minimize instead of maximize."))
