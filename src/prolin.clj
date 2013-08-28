@@ -5,10 +5,10 @@
   "Find the minimum value of an objective LinearPolynomial, subject to
   the given set of Constraints, using the specified solver implementation."
   [solver objective constraints]
-  (p/optimize objective constraints true))
+  (p/optimize solver objective constraints true))
 
 (defn maximize
   "Find the maximum value of an objective LinearPolynomial, subject to
   the given set of Constraints, using the specified solver implementation."
   [solver objective constraints]
-  (p/optimize objective constraints false))
+  (p/optimize solver objective constraints false))

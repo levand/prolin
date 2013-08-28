@@ -12,10 +12,12 @@
   (variables [this] "Return a map of variables to their coefficients.")
   (constant [this] "Returns the constant term of the polynomial"))
 
-(extend-protocol LinearPolynomial
-  clojure.lang.IPersistentMap
-  (constant [this] (::constant this))
-  (variables [this] (dissoc this ::constant)))
+(defn linear-polynomial
+  "Construct a linear polynomial, given a constant and variables map"
+  [constant variables]
+  (reify LinearPolynomial
+    (constant [this] constant)
+    (variables [this] variables)))
 
 (defprotocol Constraint
   "Representation of a linear constraint as an (in)equality"
@@ -35,9 +37,24 @@
     'subtract-polynomial' for a function to help transform
     arbitrary (in)equalities to this format."))
 
+(defn constraint
+  "Construct a constraint, given a relation and a polynomial."
+  [relation polynomial]
+  (reify Constraint
+    (relation [this] relation)
+    (polynomial [this] polynomial)))
+
 (defprotocol Solver
   "An implementation of a linear programming solver"
-  (optimize [objective constraints minimize?]
+  (optimize [this objective constraints minimize?]
     "Maximize or minimize the given objective polynomial, subject to
      the provided set of LinearConstraints. Pass true as the third
-     argument to minimize instead of maximize."))
+     argument to minimize instead of maximize. Return a variables
+     mapping representing the assignemtn of each variable present in
+     the objective and constraints.
+
+     If there is no solution matching the constraints, throws an
+     ex-info with a :reason key of :no-solution.
+
+     If the solution is unbounded by the provided constraints, throws
+     an ex-info with a :reason key of :unbounded."))
