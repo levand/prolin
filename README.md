@@ -1,4 +1,4 @@
-# prolin
+# Prolin
 
 Prolin is a linear programming library for Clojure. It provides
 idiomatic Clojure APIs to formulate and solve linear programming
