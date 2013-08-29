@@ -7,8 +7,8 @@ of LP objective functions and constraints.
 
 - http://en.wikipedia.org/wiki/Linear_programming
 
-It uses the two-phase Simplex algorithm provided by Apache Commons Math
-internally as its core LP solver.
+It uses the two-phase Simplex algorithm provided by Apache Commons
+Math as its internal LP solver.
 
 - http://en.wikipedia.org/wiki/Simplex_algorithm
 - http://commons.apache.org/proper/commons-math/userguide/optimization.html
