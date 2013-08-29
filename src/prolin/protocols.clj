@@ -9,7 +9,7 @@
 
    The keys representing variables can be any type that supports good equality semantics."
 
-  (variables [this] "Return a map of variables to their coefficients.")
+  (variables [this] "Return a map of variable identifiers to coefficients.")
   (constant [this] "Returns the constant term of the polynomial"))
 
 (defn linear-polynomial
@@ -34,7 +34,7 @@
     Any linear (in)equality can be algebraically manipulated to this
     form without any loss of generality, and it is this form that is
     used to represent all linear constraints internally. See
-    'subtract-polynomial' for a function to help transform
+    'prolin.polynomial/subtract' for a function to help transform
     arbitrary (in)equalities to this format."))
 
 (defn constraint
@@ -58,3 +58,4 @@
 
      If the solution is unbounded by the provided constraints, throws
      an ex-info with a :reason key of :unbounded."))
+

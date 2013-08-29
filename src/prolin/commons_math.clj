@@ -68,41 +68,42 @@
   "Return  an  implementation  of  Solver using  the  2-stage  Simplex
   algorithm provided by Apache Commons Math.
 
-  You may pass a map containing following options:
+  Optionally takes an options map containing the following keys:
 
   :epsilon - Amount of error to accept for algorithm convergence.
   :max-ulps - Amount of error to accept in floating point comparisons.
   :cutoff - Values smaller than the cutOff are treated as zero."
-  [options]
-  (reify p/Solver
-    (optimize [_ objective constraints minimize?]
-      (try
-        (let [opts (merge defaults options)
-              solver (SimplexSolver. (:epsilon opts) (:max-ulps opts) (:cutoff opts))
-              zero (poly/zero (reduce set/union
-                                      (keys (p/variables objective))
-                                      (map (comp set keys p/variables p/polynomial)
-                                           constraints)))
-              normalized-objective (poly/add zero objective)
-              normalized-constraints (map (fn [constraint]
-                                            (p/constraint (p/relation constraint)
-                                                          (poly/add zero (p/polynomial constraint))))
-                                          constraints)
-              optimization-data [(build-objective normalized-objective)
-                                 (build-constraints normalized-constraints)
-                                 (if minimize? GoalType/MINIMIZE GoalType/MAXIMIZE)]
-              solution (.optimize solver (into-array OptimizationData optimization-data))]
-          (zipmap (keys (p/variables zero))
-                  (.getPoint solution)))
-        (catch UnboundedSolutionException e
-            (throw (ex-info "Unbounded solution" {:reason :unbounded
-                                                  :objective objective
-                                                  :constraints constraints
-                                                  :minimize? minimize?} e)))
-        (catch NoFeasibleSolutionException e
-          (throw (ex-info "No solution" {:reason :no-solution
-                                         :objective objective
-                                         :constraints constraints
-                                         :minimize? minimize?} e)))))))
+  ([] (solver {}))
+  ([options]
+     (reify p/Solver
+       (optimize [_ objective constraints minimize?]
+         (try
+           (let [opts (merge defaults options)
+                 solver (SimplexSolver. (:epsilon opts) (:max-ulps opts) (:cutoff opts))
+                 zero (poly/zero (reduce set/union
+                                         (keys (p/variables objective))
+                                         (map (comp set keys p/variables p/polynomial)
+                                              constraints)))
+                 normalized-objective (poly/add zero objective)
+                 normalized-constraints (map (fn [constraint]
+                                               (p/constraint (p/relation constraint)
+                                                             (poly/add zero (p/polynomial constraint))))
+                                             constraints)
+                 optimization-data [(build-objective normalized-objective)
+                                    (build-constraints normalized-constraints)
+                                    (if minimize? GoalType/MINIMIZE GoalType/MAXIMIZE)]
+                 solution (.optimize solver (into-array OptimizationData optimization-data))]
+             (zipmap (keys (p/variables zero))
+                     (.getPoint solution)))
+           (catch UnboundedSolutionException e
+             (throw (ex-info "Unbounded solution" {:reason :unbounded
+                                                   :objective objective
+                                                   :constraints constraints
+                                                   :minimize? minimize?} e)))
+           (catch NoFeasibleSolutionException e
+             (throw (ex-info "No solution" {:reason :no-solution
+                                            :objective objective
+                                            :constraints constraints
+                                            :minimize? minimize?} e))))))))
 
 
