@@ -5,14 +5,14 @@ idiomatic Clojure APIs to formulate and solve linear programming
 problems, and a small set of utilties for some common transformations
 of LP objective functions and constraints.
 
-http://en.wikipedia.org/wiki/Linear_programming
+- http://en.wikipedia.org/wiki/Linear_programming
 
 It uses the two-phase Simplex algorithm provided by Apache Commons Math
 internally as its core LP solver.
 
-http://en.wikipedia.org/wiki/Simplex_algorithm
-http://commons.apache.org/proper/commons-math/userguide/optimization.html
-http://google-opensource.blogspot.com/2009/06/introducing-apache-commons-math.html
+- http://en.wikipedia.org/wiki/Simplex_algorithm
+- http://commons.apache.org/proper/commons-math/userguide/optimization.html
+- http://google-opensource.blogspot.com/2009/06/introducing-apache-commons-math.html
 
 There are several value propositions to using Prolin over Commons Math directly:
 
@@ -30,7 +30,7 @@ The API is centered around a few key protocols.
 #### Polynomials
 
 An instance of `prolin.protocols.LinearPolynomial` represents a linear
-polynomial. LinearPolynomials are a building blocks of linear
+polynomial. LinearPolynomials are a key building block of linear
 programming.
 
 ```clojure
@@ -41,21 +41,22 @@ programming.
    - Any number of variables, each with a numerical coefficient
    - A constant numerical term
 
-   The keys representing variables can be any type that supports good equality semantics."
+   The keys representing variables can be any type that supports good
+   equality semantics."
 
   (variables [this] "Return a map of variable identifiers to coefficients.")
   (constant [this] "Returns the constant term of the polynomial"))
 ```
 
-A `linear-polynomial` function is provided to construct a
+A `prolin.protocols/linear-polynomial` function is provided to construct a
 LinearPolynomial from a constant number and a variables map.
 
 An implementation of `LinearPolynomial` for `java.lang.String` is
-provided, allowing strings such as "x + y - 4" or "3x + 4y - 2z" to be
-used for easy experimentation and testing. Note that the parser is not
-sophisticated and is provided mostly for testing; it will only work
-for basic equations or inequalities (not, for example, equations with
-parenthesis, multiple constant terms, etc.)
+provided, allowing strings such as `"x + y - 4"` or `"3x + 4y - 2z"`
+to be used anywhere you want a polynomial. Note that the parser is not
+sophisticated and is provided mostly for experimentation and testing;
+it will only work for basic equations or inequalities (not, for
+example, equations with parenthesis, multiple constant terms, etc.)
 
 The `prolin.polynomial` namespace contains utility functions for:
 
@@ -71,7 +72,7 @@ Linear constraints are linear equalities or inequalities that are used
 to restrict the 'feasible region' of a linear programming problem.
 
 Constraints are represented as the `prolin.protocols.Constraint`
-protocol to allow callers to define implementations that are the best
+protocol, to allow callers to define implementations that are the best
 fit for a particular problem.
 
 ```clojure
@@ -94,12 +95,13 @@ fit for a particular problem.
     arbitrary (in)equalities to this format."))
 ```
 
-A `constraint` constructor is also provided, to construct a constraint
+A `prolin.protocols/constraint` constructor is also provided, to construct a constraint
 directly from a polynomial and its relation to 0.
 
 Additionally, `Constraint` is extended to `java.lang.String` to allow
-Strings such as "x = y", "3x + y => 4" to be used in experimentation
-and testing.
+Strings such as `"x = y"`, `"3x + y => 4"` to be used anywhere you
+want a Constraint. Again, note that the parsing of such strings is
+naive and intended only for experimentation and testing.
 
 
 #### Solving
@@ -128,7 +130,7 @@ function (as a `LinearPolynomial`), a collection of `Constraints`, and
 a boolean (true to minimize the objective, false to maximize it.)
 
 The `prolin/maximize` and `prolin/minimize` functions have the same
-signature, elimitating the final boolean.
+signature, but eliminating the final boolean flag.
 
 ### Examples
 
@@ -138,6 +140,7 @@ signature, elimitating the final boolean.
 (require '[prolin.protocols :as pp])
 (require '[prolin.commons-math :as cm])
 
+;; Maximize x
 (p/optimize (cm/solver) "x" #{"x <= 5", "x >= -2"} false)
 ;; => {"x" 5.0}
 
