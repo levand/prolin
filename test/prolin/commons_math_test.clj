@@ -1,6 +1,5 @@
 (ns prolin.commons-math-test
   (:require [clojure.test :refer :all]
-            [prolin.testutil :as util]
             [prolin :as prolin]
             [prolin.commons-math :as cm]
             [prolin.protocols :as p]))
@@ -23,4 +22,3 @@
   (let [constraints #{"x = -2", "x >= 0"}]
     (is (thrown? clojure.lang.ExceptionInfo
                  (prolin/maximize (cm/solver) "x" constraints)))))
-

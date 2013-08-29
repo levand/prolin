@@ -15,6 +15,52 @@
             UnboundedSolutionException
             NoFeasibleSolutionException]))
 
+(def ^:dynamic *debug* false)
+
+(defmulti debug class)
+
+(defmethod debug prolin.protocols.LinearPolynomial
+  [p]
+  (str (p/variables p) " " (p/constant p)))
+
+(defmethod debug prolin.protocols.Constraint
+  [c]
+  (str (debug (p/polynomial c)) " " (p/relation c) " 0"))
+
+(defmethod debug :default
+  [o]
+  (str o))
+
+(defmethod debug org.apache.commons.math3.linear.RealVector
+  [v]
+  (str (seq (.toArray v))))
+
+(defmethod debug LinearObjectiveFunction
+  [objective]
+  (str (.getConstantTerm objective) ", " (debug (.getCoefficients objective))))
+
+(defmethod debug LinearConstraint
+  [c]
+  (str (debug (.getCoefficients c)) " " (debug (.getRelationship c)) " " (.getValue c)))
+
+(defmethod debug LinearConstraintSet
+  [cs]
+  (str (str/join "\n" (map debug (.getConstraints cs)))))
+
+(defn- print-cm-debug-info
+  [[objective constraints]]
+  (println "======")
+  (println "raw objective:" (debug objective))
+  (doseq [constraint (.getConstraints constraints)]
+    (println "raw constraint:" (debug constraint))))
+
+(defn- print-debug-info
+  [objective constraints]
+  (println "======")
+  (println "objective:" (debug objective))
+  (doseq [constraint constraints]
+    (println "constraint:" (debug constraint))))
+
 (defn- build-objective
   "Build a LinearObjectiveFunction from a normalized p/LinearPolynomial"
   [poly]
@@ -40,29 +86,6 @@
   {:epsilon 1.0e-6
    :max-ulps 10
    :cutoff 1.0e-12})
-
-(defmulti debug class)
-
-(defmethod debug :default
-  [o]
-  (str o))
-
-(defmethod debug org.apache.commons.math3.linear.RealVector
-  [v]
-  (str (seq (.toArray v))))
-
-(defmethod debug LinearObjectiveFunction
-  [objective]
-  (str "objective: " (.getConstantTerm objective) ", " (debug (.getCoefficients objective))))
-
-(defmethod debug LinearConstraint
-  [c]
-  (str "constraint: " (debug (.getCoefficients c)) " " (debug (.getRelationship c)) " " (.getValue c)))
-
-(defmethod debug LinearConstraintSet
-  [cs]
-  (str (str/join "\n" (map debug (.getConstraints cs)))))
-
 
 (defn solver
   "Return  an  implementation  of  Solver using  the  2-stage  Simplex
@@ -92,6 +115,8 @@
                  optimization-data [(build-objective normalized-objective)
                                     (build-constraints normalized-constraints)
                                     (if minimize? GoalType/MINIMIZE GoalType/MAXIMIZE)]
+                 _ (when *debug* (print-debug-info normalized-objective normalized-constraints))
+                 _ (when *debug* (print-cm-debug-info optimization-data))
                  solution (.optimize solver (into-array OptimizationData optimization-data))]
              (zipmap (keys (p/variables zero))
                      (.getPoint solution)))
