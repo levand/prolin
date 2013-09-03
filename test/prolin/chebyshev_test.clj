@@ -12,9 +12,10 @@
   (Precision/equals (double x) (double y) 1e-6))
 
 (deftest center-of-line
-  (is (= 0 (prolin/maximize (cm/solver)
-                            "r" (chebyshev-center ["x <= 10"
-                                                   "x >= -10"] "r")))))
+  (is (f= 0 (get (prolin/maximize (cm/solver)
+                                  "r" (chebyshev-center ["x <= 10"
+                                                         "x >= -10"] "r"))
+                 "x"))))
 
 (deftest center-of-square
   (is (= {"x" 0.5 "y" 0.5 "r" 0.5}
