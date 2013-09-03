@@ -1,4 +1,4 @@
-(defproject prolin "0.1.1"
+(defproject prolin "0.1.2"
   :description "A linear programming library for Clojure"
   :url "http://github.com/levand/prolin"
   :license {:name "Eclipse Public License"
