@@ -28,9 +28,7 @@
 
 (defn zero
   "Construct a LinearPolynomial that contains the set of provided
-   variables, each with a coefficient of zero. The variables map that
-   is returned is a sorted map and thus is guaranteed to have a stable
-   ordering of variables."
+   variables, each with a coefficient of zero."
   [variables]
   (let [vs (into (sorted-map) (map (fn [v] [v 0]) variables))]
     (reify p/LinearPolynomial

@@ -62,9 +62,11 @@
     (println "constraint:" (debug constraint))))
 
 (defn- build-objective
-  "Build a LinearObjectiveFunction from a normalized p/LinearPolynomial"
-  [poly]
-  (LinearObjectiveFunction. (double-array (vals (p/variables poly)))
+  "Build a LinearObjectiveFunction from a normalized
+  p/LinearPolynomial, with coefficients ordered by the supplied
+  ordered key sequence."
+  [poly key-sequence]
+  (LinearObjectiveFunction. (double-array (map (p/variables poly) key-sequence))
                             (double (p/constant poly))))
 
 (def relationships {'= Relationship/EQ
@@ -72,11 +74,13 @@
                     '>= Relationship/GEQ})
 
 (defn- build-constraints
-  "Build a LinearConstraintSet from the provided p/Constraints"
-  [constraints]
+  "Build a LinearConstraintSet from the provided p/Constraints, with
+  coefficients ordered by the supplied ordered key sequence."
+  [constraints key-sequence]
   (LinearConstraintSet.
    (map (fn [constraint]
-          (LinearConstraint. (double-array (vals (p/variables (p/polynomial constraint))))
+          (LinearConstraint. (double-array (map (p/variables (p/polynomial constraint))
+                                                key-sequence))
                              (relationships (p/relation constraint))
                              (double (* -1 (p/constant (p/polynomial constraint))))))
         constraints)))
@@ -107,13 +111,14 @@
                                          (keys (p/variables objective))
                                          (map (comp set keys p/variables p/polynomial)
                                               constraints)))
+                 coefficient-ordering (keys (p/variables zero))
                  normalized-objective (poly/add zero objective)
                  normalized-constraints (map (fn [constraint]
                                                (p/constraint (p/relation constraint)
                                                              (poly/add zero (p/polynomial constraint))))
                                              constraints)
-                 optimization-data [(build-objective normalized-objective)
-                                    (build-constraints normalized-constraints)
+                 optimization-data [(build-objective normalized-objective coefficient-ordering)
+                                    (build-constraints normalized-constraints coefficient-ordering)
                                     (if minimize? GoalType/MINIMIZE GoalType/MAXIMIZE)]
                  _ (when *debug* (print-debug-info normalized-objective normalized-constraints))
                  _ (when *debug* (print-cm-debug-info optimization-data))
