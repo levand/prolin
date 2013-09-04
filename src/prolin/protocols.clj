@@ -12,12 +12,16 @@
   (variables [this] "Return a map of variable identifiers to coefficients.")
   (constant [this] "Returns the constant term of the polynomial"))
 
+(extend-protocol LinearPolynomial
+  clojure.lang.APersistentMap
+  (variables [this] (:v this))
+  (constant [this] (:c this)))
+
 (defn linear-polynomial
   "Construct a linear polynomial, given a constant and variables map"
   [constant variables]
-  (reify LinearPolynomial
-    (constant [this] constant)
-    (variables [this] variables)))
+  {:c constant
+   :v variables})
 
 (defprotocol Constraint
   "Representation of a linear constraint as an (in)equality"
@@ -37,12 +41,15 @@
     'prolin.polynomial/subtract' for a function to help transform
     arbitrary (in)equalities to this format."))
 
+(extend-protocol Constraint
+  clojure.lang.APersistentMap
+  (relation [this] (:r this))
+  (polynomial [this] (:p this)))
+
 (defn constraint
   "Construct a constraint, given a relation and a polynomial."
   [relation polynomial]
-  (reify Constraint
-    (relation [this] relation)
-    (polynomial [this] polynomial)))
+  {:r relation :p polynomial})
 
 (defprotocol Solver
   "An implementation of a linear programming solver"

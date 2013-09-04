@@ -1,5 +1,4 @@
 (ns prolin.polynomial
-  (:refer-clojure :exclude [merge])
   (:require [prolin.protocols :as p]))
 
 (defn multiply
@@ -44,3 +43,5 @@
           (map (fn [[v c]]
                  (* c (values v 0)))
                (p/variables polynomial))))
+
+
